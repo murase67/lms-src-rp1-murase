@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	th:replace="~{/common/layout :: layout(~{::title},~{::body/content()})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{/common/layout :: layout(~{::title},~{::body/content()})}">
+
 <head>
-<meta charset="UTF-8">
-<title>勤怠情報変更｜LMS</title>
+	<meta charset="UTF-8">
+	<title>勤怠情報変更｜LMS</title>
 </head>
+
 <body>
 
 	<!-- 完了メッセージ -->
@@ -42,10 +43,10 @@
 	</th:block>
 
 	<div class="row">
-		<div class="bs-component col-sm-12">
-			<table class="table table-hover dataTable no-footer">
+		<div style="width: 100%; max-height: 410px; overflow-y: auto;" class="bs-component col-sm-12">
+			<table style="width: 100%; border-collapse: collapse;" class="table table-hover dataTable no-footer">
 				<thead class="db">
-					<tr>
+					<tr style="position: sticky; top: 0; left: 0;">
 						<th class="w160">日付</th>
 						<th class="w260">コース内容</th>
 						<th class="w80">出勤</th>
@@ -57,7 +58,8 @@
 				</thead>
 
 				<tbody class="db">
-					<th:block th:each="attendanceManagementDto : ${attendanceManagementDtoList}" th:object="${attendanceManagementDto}">
+					<th:block th:each="attendanceManagementDto : ${attendanceManagementDtoList}"
+						th:object="${attendanceManagementDto}">
 						<tr>
 							<td class="w160">[[*{#dates.format(trainingDate, 'yyyy年M月d日(E)')}]]</td>
 							<td class="w260">[[*{sectionName}]]</td>
@@ -74,14 +76,14 @@
 	</div>
 
 	<script type="text/javascript" th:inline="javascript">
-		$(function() {
+		$(function () {
 			$("#now").text('現在の時刻は　' + getClock() + '　です。');
-			setInterval(function() {
+			setInterval(function () {
 				$("#now").text('現在の時刻は　' + getClock() + '　です。');
 			}, 1000);
 		});
 		function getClock() {
-			const today =  new Date();
+			const today = new Date();
 			const hours = ('0' + today.getHours()).slice(-2);
 			const minutes = ('0' + today.getMinutes()).slice(-2);
 			return hours + ':' + minutes;
@@ -89,4 +91,5 @@
 	</script>
 
 </body>
+
 </html>
