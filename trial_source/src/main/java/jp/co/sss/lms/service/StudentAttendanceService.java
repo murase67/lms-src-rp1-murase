@@ -334,4 +334,19 @@ public class StudentAttendanceService {
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
 	}
 
+	//サービスクラス
+	public boolean hasUnenteredPastAttendance() {
+
+		Integer courseId = loginUserDto.getCourseId();
+		Integer lmsUserId = loginUserDto.getLmsUserId();
+
+		Date today = new Date();
+
+		Integer count = tStudentAttendanceMapper.notEnterCount(lmsUserId, (short) 0, today);
+
+		System.out.println(count);
+
+		return count != null && count > 0;
+	}
+
 }
