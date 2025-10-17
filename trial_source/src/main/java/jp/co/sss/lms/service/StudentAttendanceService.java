@@ -1,6 +1,7 @@
 package jp.co.sss.lms.service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -339,12 +340,12 @@ public class StudentAttendanceService {
 
 		Integer courseId = loginUserDto.getCourseId();
 		Integer lmsUserId = loginUserDto.getLmsUserId();
+		
+//		Date today = new Date();
+//		
+//		Integer count = tStudentAttendanceMapper.notEnterCount(lmsUserId, (short) 0, today);
 
-		Date today = new Date();
-
-		Integer count = tStudentAttendanceMapper.notEnterCount(lmsUserId, (short) 0, today);
-
-		System.out.println(count);
+		Integer count = tStudentAttendanceMapper.notEnterCount(lmsUserId, (short) 0, LocalDate.now());
 
 		return count != null && count > 0;
 	}

@@ -1,5 +1,6 @@
 package jp.co.sss.lms.mapper;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -70,10 +71,10 @@ public interface TStudentAttendanceMapper {
 	 * 
 	 * @param lmsUserId
 	 * @param deleteFlg
-	 * @param trainingDate
+	 * @param localDate
 	 * @return 過去日の未入力件数
 	 * 
 	 */
-	Integer notEnterCount(@Param("lmsUserId") Integer lmsUserId, @Param("deleteFlg") Short deleteFlag, @Param("trainingDate") Date trainingDate);
+	Integer notEnterCount(@Param("lmsUserId") Integer lmsUserId, @Param("deleteFlg") Short deleteFlag, @Param("trainingDate") LocalDate localDate);
 
 }

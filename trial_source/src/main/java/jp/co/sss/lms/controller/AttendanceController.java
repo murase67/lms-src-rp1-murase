@@ -41,19 +41,19 @@ public class AttendanceController {
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) {
-		
-		System.out.println("呼び出し確認");
 
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
 		
+		//Task29
+		//過去日の未入力チェック
 		boolean hasUnenteredPast = studentAttendanceService.hasUnenteredPastAttendance();
 	    model.addAttribute("hasUnenteredPast", hasUnenteredPast);
 	    
-	    System.out.print(hasUnenteredPast);
-		
+	    System.out.println(hasUnenteredPast);
+	    		
 		return "attendance/detail";
 	}
 

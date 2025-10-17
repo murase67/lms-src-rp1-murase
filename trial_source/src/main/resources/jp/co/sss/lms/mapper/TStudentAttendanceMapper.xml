@@ -90,13 +90,12 @@
 		SELECT COUNT(*)
 		FROM t_student_attendance
 		WHERE lms_user_id = #{lmsUserId}
-			AND delete_flg = #{deleteFlg}
-			AND training_date &lt; #{trainingDate}
-			AND status != 1
-			AND (training_start_time IS NULL
-         		OR training_start_time = ''
-          		OR training_end_time IS NULL
-          		OR training_end_time = '')
+	 		AND delete_flg = #{deleteFlg}
+	  		AND training_date &lt; #{trainingDate}
+	  		AND status != 1
+	  		AND (training_end_time = '' OR training_start_time = ''
+	    		OR training_start_time IS NULL OR training_end_time IS NULL
+	  			)
 	</select>
 
 </mapper>
