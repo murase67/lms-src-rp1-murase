@@ -1,6 +1,8 @@
 package jp.co.sss.lms.util;
 
 import java.text.ParseException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -14,6 +16,9 @@ import jp.co.sss.lms.mapper.MSectionMapper;
  * 勤怠管理のユーティリティクラス
  * 
  * @author 東京ITスクール
+ */
+/**
+ * 
  */
 @Component
 public class AttendanceUtil {
@@ -146,5 +151,46 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * 時間のプルダウンマップを生成
+	 * 
+	 * @return 1時間刻みの時間マップ
+	 */
+	public LinkedHashMap<Integer, String> getHourMap() {
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH");
+		
+		LinkedHashMap<Integer, String> hourMap = new LinkedHashMap<>();
+		
+		LocalTime time = LocalTime.MIDNIGHT;
+		for(int hour = 0; hour < 24; hour++) {
+			hourMap.put(hour, time.format(formatter));
+			time = time.plusHours(1);
+		}
+		
+		return hourMap;
+	}
+	
+	
+	/**
+	 * 分のプルダウンマップを生成
+	 * 
+	 * @return　1分刻みの時間マップ
+	 */
+	public LinkedHashMap<Integer, String> getMinuteMap(){
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm");
+		
+		LinkedHashMap<Integer, String> minuteMap = new LinkedHashMap<>();
+		
+		LocalTime time = LocalTime.MIDNIGHT;
+		for(int minute = 0; minute < 60; minute++) {
+			minuteMap.put(minute, time.format(formatter));
+			time = time.plusHours(1);
+		}
+		
+		return minuteMap;
+	}
+	
 }

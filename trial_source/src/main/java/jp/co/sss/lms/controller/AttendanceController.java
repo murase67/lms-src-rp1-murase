@@ -14,6 +14,7 @@ import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
+import jp.co.sss.lms.util.AttendanceUtil;
 import jp.co.sss.lms.util.Constants;
 
 /**
@@ -29,6 +30,8 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	@Autowired
+	private AttendanceUtil attendanceUtil;
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -47,12 +50,10 @@ public class AttendanceController {
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
 		
-		//Task29
+		//Task25
 		//過去日の未入力チェック
 		boolean hasUnenteredPast = studentAttendanceService.hasUnenteredPastAttendance();
 	    model.addAttribute("hasUnenteredPast", hasUnenteredPast);
-	    
-	    System.out.println(hasUnenteredPast);
 	    		
 		return "attendance/detail";
 	}
@@ -123,7 +124,11 @@ public class AttendanceController {
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
 		model.addAttribute("attendanceForm", attendanceForm);
-
+		
+		model.addAttribute("hour", attendanceUtil.getHourMap());
+		
+		System.out.println(attendanceUtil.getHourMap());
+		
 		return "attendance/update";
 	}
 

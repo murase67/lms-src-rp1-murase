@@ -58,8 +58,21 @@
 									<td class="w140">[[${dailyAttendanceForm.dispTrainingDate}]]</td>
 									<td class="w300">[[${dailyAttendanceForm.sectionName}]]</td>
 									<td class="w70">
-										<input type="text" th:name="|attendanceList[${stat.index}].trainingStartTime|"
-											th:value="${dailyAttendanceForm.trainingStartTime}" class="form-control" />
+										<!--										<input type="text" th:name="|attendanceList[${stat.index}].trainingStartTime|"-->
+										<!--											th:value="${dailyAttendanceForm.trainingStartTime}" class="form-control" />-->
+										<!--										<select th:name="|hourMap[${stat.index}]|">-->
+										<!--											<option th:each="hourMap : ${hourMap}"-->
+										<!--											th:value=""-->
+										<!--										</select>-->
+										<select th:name="${hourMap}"
+											class="form-control">
+											<option th:each="hour : ${hourMap}"
+												th:value="${hour}" th:inlne="text" class="form-control">
+<!--												th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">-->
+												[[${hourMap.value}]]</option>
+										</select>
+									</td>
+
 									</td>
 									<td class="w70">
 										<input type="text" th:name="|attendanceList[${stat.index}].trainingEndTime|"
