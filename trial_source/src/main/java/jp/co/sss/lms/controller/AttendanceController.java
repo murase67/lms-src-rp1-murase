@@ -49,12 +49,12 @@ public class AttendanceController {
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-		
-		//Task25
+
+		//村瀬菜水香 - Task25
 		//過去日の未入力チェック
 		boolean hasUnenteredPast = studentAttendanceService.hasUnenteredPastAttendance();
-	    model.addAttribute("hasUnenteredPast", hasUnenteredPast);
-	    		
+		model.addAttribute("hasUnenteredPast", hasUnenteredPast);
+
 		return "attendance/detail";
 	}
 
@@ -124,11 +124,11 @@ public class AttendanceController {
 		AttendanceForm attendanceForm = studentAttendanceService
 				.setAttendanceForm(attendanceManagementDtoList);
 		model.addAttribute("attendanceForm", attendanceForm);
-		
-		model.addAttribute("hour", attendanceUtil.getHourMap());
-		
-		System.out.println(attendanceUtil.getHourMap());
-		
+
+		// Task26 時・分のプルダウンマップの取得
+		model.addAttribute("hourMap", attendanceUtil.getHourMap());
+		model.addAttribute("minuteMap", attendanceUtil.getMinuteMap());
+
 		return "attendance/update";
 	}
 

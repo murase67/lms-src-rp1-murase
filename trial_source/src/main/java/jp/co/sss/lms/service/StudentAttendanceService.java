@@ -1,6 +1,7 @@
 package jp.co.sss.lms.service;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +44,10 @@ public class StudentAttendanceService {
 	private LoginUserDto loginUserDto;
 	@Autowired
 	private TStudentAttendanceMapper tStudentAttendanceMapper;
+	
+	//削除フラグ
+	private static final short DELETE_FLG_FALSE = 0;
+    private static final short DELETE_FLG_TRUE = 1;
 
 	/**
 	 * 勤怠一覧情報取得
@@ -219,6 +224,8 @@ public class StudentAttendanceService {
 		attendanceForm.setUserName(loginUserDto.getUserName());
 		attendanceForm.setLeaveFlg(loginUserDto.getLeaveFlg());
 		attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+		attendanceForm.setHourMap(attendanceUtil.getHourMap());
+		attendanceForm.setMinuteMap(attendanceUtil.getMinuteMap());
 
 		// 途中退校している場合のみ設定
 		if (loginUserDto.getLeaveDate() != null) {
@@ -337,16 +344,39 @@ public class StudentAttendanceService {
 	/**
 	 * 勤怠管理過去日未入力チェック
 	 * 
+	 * @author 村瀬菜水香 - Task25
 	 * @return 過去日の未入力チェック判定結果
 	 */
 	public boolean hasUnenteredPastAttendance() {
 
 		Integer lmsUserId = loginUserDto.getLmsUserId();
-		Date trainingDate = attendanceUtil.getTrainingDate();
-				
-		Integer count = tStudentAttendanceMapper.notEnterCount(lmsUserId, (short) 0, trainingDate);
-
-		return count != null && count > 0;
+		
+		Date trainingDate = null;
+		try {
+			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+			String today = format.format(new Date());
+			trainingDate = format.parse(today);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+						
+		Integer notInputCount = tStudentAttendanceMapper.notEnterCount(lmsUserId, DELETE_FLG_FALSE, trainingDate);
+		
+		return notInputCount != null && notInputCount > 0;
+	}
+	
+	public Integer getHour(String trainingStartHour) {
+		
+		Integer hour = Integer.parseInt(trainingStartHour);
+		
+		return hour;
+	}
+	
+	public Integer getMinute(String trainingStartMinute) {
+		
+		Integer minute = Integer.parseInt(trainingStartMinute);
+		
+		return minute;
 	}
 
 }

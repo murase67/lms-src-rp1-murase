@@ -168,7 +168,7 @@ public class AttendanceUtil {
 			hourMap.put(hour, time.format(formatter));
 			time = time.plusHours(1);
 		}
-		
+				
 		return hourMap;
 	}
 	
@@ -187,10 +187,20 @@ public class AttendanceUtil {
 		LocalTime time = LocalTime.MIDNIGHT;
 		for(int minute = 0; minute < 60; minute++) {
 			minuteMap.put(minute, time.format(formatter));
-			time = time.plusHours(1);
+			time = time.plusMinutes(1);
 		}
 		
 		return minuteMap;
 	}
 	
+	public Integer getHour(String trainingStartTime) {
+		Integer trainingHour = Integer.parseInt(trainingStartTime);
+		return trainingHour;
+	}
+	
+	public Integer getMinute(String trainingEndTime) {
+		Integer trainingMinute = Integer.parseInt(trainingEndTime);
+		return trainingMinute;
+	}
+		
 }
