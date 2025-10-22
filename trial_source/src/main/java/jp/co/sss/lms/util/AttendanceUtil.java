@@ -151,56 +151,86 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 時間のプルダウンマップを生成
 	 * 
 	 * @return 1時間刻みの時間マップ
 	 */
 	public LinkedHashMap<Integer, String> getHourMap() {
-		
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH");
-		
+
 		LinkedHashMap<Integer, String> hourMap = new LinkedHashMap<>();
-		
+
 		LocalTime time = LocalTime.MIDNIGHT;
-		for(int hour = 0; hour < 24; hour++) {
+		for (int hour = 0; hour < 24; hour++) {
 			hourMap.put(hour, time.format(formatter));
 			time = time.plusHours(1);
 		}
-				
+
 		return hourMap;
 	}
-	
-	
+
 	/**
 	 * 分のプルダウンマップを生成
 	 * 
 	 * @return　1分刻みの時間マップ
 	 */
-	public LinkedHashMap<Integer, String> getMinuteMap(){
-		
+	public LinkedHashMap<Integer, String> getMinuteMap() {
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm");
-		
+
 		LinkedHashMap<Integer, String> minuteMap = new LinkedHashMap<>();
-		
+
 		LocalTime time = LocalTime.MIDNIGHT;
-		for(int minute = 0; minute < 60; minute++) {
+		for (int minute = 0; minute < 60; minute++) {
 			minuteMap.put(minute, time.format(formatter));
 			time = time.plusMinutes(1);
 		}
-		
+
 		return minuteMap;
 	}
-	
+
+	/**
+	 * 時間（時）を切り出す
+	 * 
+	 * @param trainingStartTime
+	 * @return hour
+	 */
 	public Integer getHour(String trainingStartTime) {
-		Integer trainingHour = Integer.parseInt(trainingStartTime);
-		return trainingHour;
+		if (trainingStartTime == null || trainingStartTime.isEmpty() || !trainingStartTime.contains(":")) {
+			return null;
+		}
+
+		try {
+			String[] parts = trainingStartTime.split(":");
+			Integer hour = Integer.parseInt(parts[0]);
+			return hour;
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
-	
-	public Integer getMinute(String trainingEndTime) {
-		Integer trainingMinute = Integer.parseInt(trainingEndTime);
-		return trainingMinute;
+
+	/**
+	 * 時間（分）を切り出す
+	 * 
+	 * @param trainingStartTime
+	 * @return minute
+	 */
+	public Integer getMinute(String trainingStartTime) {
+		if (trainingStartTime == null || trainingStartTime.isEmpty() || !trainingStartTime.contains(":")) {
+			return null;
+		}
+
+		try {
+			String[] parts = trainingStartTime.split(":");
+			Integer minute = Integer.parseInt(parts[1]);
+			return minute;
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
-		
 }

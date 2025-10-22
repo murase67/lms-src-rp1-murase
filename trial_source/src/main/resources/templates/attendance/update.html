@@ -66,7 +66,9 @@
 												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}"></option>
+													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingStartHour}">
+												[[${entry.value}]]>
+												</option>
 											</select>
 											<span>：</span>
 											<select th:name="|attendanceList[${stat.index}].trainingStartMinute|"
@@ -74,7 +76,9 @@
 												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}"></option>
+													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingStartMinute}">
+												[[${entry.value}]]>
+												</option>
 											</select>
 										</div>
 									</td>
@@ -87,7 +91,9 @@
 												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}"></option>
+													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingEndHour}">
+												[[${entry.value}]]>
+												</option>
 											</select>
 											<span>：</span>
 											<select th:name="|attendanceList[${stat.index}].trainingEndMinute|"
@@ -95,7 +101,9 @@
 												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}"></option>
+													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingEndMinute}">
+												[[${entry.value}]]>
+													</option>
 											</select>
 										</div>
 									</td>
