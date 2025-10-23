@@ -22,7 +22,7 @@
 	<div class="row">
 		<div>
 
-			<form th:action="@{/attendance/update}" method="post">
+			<form th:action="@{/attendance/update}" method="post" onsubmit="updateCheck()">
 				<div style="width: 100%; max-height: 600px; overflow-y: auto;" class="bs-component col-sm-12">
 					<table style="width: 100%; border-collapse: collapse;"
 						class="table table-hover dataTable no-footer">
@@ -63,21 +63,23 @@
 											style="display:inline-flex; align-items:center; justify-content:center; gap:4px;">
 											<select th:name="|attendanceList[${stat.index}].trainingStartHour|"
 												class="form-control"
-												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
+												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingStartHour}">
-												[[${entry.value}]]>
+													th:text="${entry.value}"
+													th:selected="${entry.key == dailyAttendanceForm.trainingStartHour}">
+													[[${entry.value}]]>
 												</option>
 											</select>
 											<span>：</span>
 											<select th:name="|attendanceList[${stat.index}].trainingStartMinute|"
 												class="form-control"
-												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
+												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingStartMinute}">
-												[[${entry.value}]]>
+													th:text="${entry.value}"
+													th:selected="${entry.key == dailyAttendanceForm.trainingStartMinute}">
+													[[${entry.value}]]>
 												</option>
 											</select>
 										</div>
@@ -88,34 +90,38 @@
 											style="display:inline-flex; align-items:center; justify-content:center; gap:4px;">
 											<select th:name="|attendanceList[${stat.index}].trainingEndHour|"
 												class="form-control"
-												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
+												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingEndHour}">
-												[[${entry.value}]]>
+													th:text="${entry.value}"
+													th:selected="${entry.key == dailyAttendanceForm.trainingEndHour}">
+													[[${entry.value}]]>
 												</option>
 											</select>
 											<span>：</span>
 											<select th:name="|attendanceList[${stat.index}].trainingEndMinute|"
 												class="form-control"
-												style="display:inline-block !important; width:70px !important; padding:2px; height:38px;">
+												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
 												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}" th:selected="${entry.key == dailyAttendanceForm.trainingEndMinute}">
-												[[${entry.value}]]>
-													</option>
+													th:text="${entry.value}"
+													th:selected="${entry.key == dailyAttendanceForm.trainingEndMinute}">
+													[[${entry.value}]]>
+												</option>
 											</select>
 										</div>
 									</td>
 
 									<td class="w80">
-										<select th:name="|attendanceList[${stat.index}].blankTime|"
-											class="form-control">
-											<option th:each="blankTime : ${attendanceForm.blankTimes}"
-												th:value="${blankTime.key}" th:inlne="text" class="form-control"
-												th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">
-												[[${blankTime.value}]]</option>
-										</select>
+										<div style="width: 90px;">
+											<select th:name="|attendanceList[${stat.index}].blankTime|"
+												class="form-control">
+												<option th:each="blankTime : ${attendanceForm.blankTimes}"
+													th:value="${blankTime.key}" th:inlne="text" class="form-control"
+													th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">
+													[[${blankTime.value}]]</option>
+											</select>
+										</div>
 									</td>
 									<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
 									<td class="w240">
@@ -141,6 +147,17 @@
 			</form>
 		</div>
 	</div>
+	<script type="text/javascript" th:inline="javascript">
+
+		//Task27-村瀬-更新ボタン押下時に確認ダイアログを表示
+		function updateCheck() {
+			let result = confirm("更新します。よろしいですか？");
+			if (!result) {
+				event.preventDefault();
+			}
+		}
+
+	</script>
 
 </body>
 

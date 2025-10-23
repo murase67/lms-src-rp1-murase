@@ -2,6 +2,7 @@ package jp.co.sss.lms.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -285,7 +286,7 @@ public class StudentAttendanceService {
 		// 現在の勤怠情報（受講生入力）リストを取得
 		List<TStudentAttendance> tStudentAttendanceList = tStudentAttendanceMapper
 				.findByLmsUserId(lmsUserId, Constants.DB_FLG_FALSE);
-		
+
 		Date date = new Date();
 		// 入力された情報を更新用のエンティティに移し替え
 		for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
@@ -319,9 +320,8 @@ public class StudentAttendanceService {
 				trainingStartTime = new TrainingTime(startTime);
 				tStudentAttendance.setTrainingStartTime(trainingStartTime.getFormattedString());
 			} else {
-				tStudentAttendance.setTrainingStartTime("");
+				tStudentAttendance.setTrainingStartTime(null);
 			}
-
 			// 退勤時刻整形
 			Integer endHour = dailyAttendanceForm.getTrainingEndHour();
 			Integer endMinute = dailyAttendanceForm.getTrainingEndMinute();
@@ -332,7 +332,7 @@ public class StudentAttendanceService {
 				trainingEndTime = new TrainingTime(endTime);
 				tStudentAttendance.setTrainingEndTime(trainingEndTime.getFormattedString());
 			} else {
-				tStudentAttendance.setTrainingEndTime("");
+				tStudentAttendance.setTrainingEndTime(null);
 			}
 
 			// 中抜け時間
@@ -344,6 +344,9 @@ public class StudentAttendanceService {
 				AttendanceStatusEnum attendanceStatusEnum = attendanceUtil.getStatus(trainingStartTime,
 						trainingEndTime);
 				tStudentAttendance.setStatus(attendanceStatusEnum.code);
+			} else if (!"欠席".equals(dailyAttendanceForm.getStatusDispName())) {
+			    // 時間が未入力なら「NONE（空）」に戻す
+			    tStudentAttendance.setStatus(AttendanceStatusEnum.NONE.code);
 			}
 			// 備考
 			tStudentAttendance.setNote(dailyAttendanceForm.getNote());
@@ -387,14 +390,63 @@ public class StudentAttendanceService {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println(trainingDate);
 
 		Integer notInputCount = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE, trainingDate);
-		
-		System.out.println(notInputCount);
 
 		return notInputCount != null && notInputCount > 0;
 	}
+	
+	/**
+	 * Task27 更新ボタン押下時入力チェック
+	 * 
+	 * @author 村瀬
+	 * @param attendanceForm
+	 * @return
+	 */
+	public String validationAttendanceUpdate(AttendanceForm attendanceForm) {
+		for (DailyAttendanceForm dailyForm : attendanceForm.getAttendanceList()) {
 
+			boolean hasStartHour = dailyForm.getTrainingStartHour() != null;
+			boolean hasStartMinute = dailyForm.getTrainingStartMinute() != null;
+			boolean hasEndHour = dailyForm.getTrainingEndHour() != null;
+			boolean hasEndMinute = dailyForm.getTrainingEndMinute() != null;
+			String hasStartTime = dailyForm.getTrainingStartTime();
+			String hasEndTime = dailyForm.getTrainingEndTime();
+			String hasNote = dailyForm.getNote();
+			
+			if(hasNote.length() > 100) {
+				String noteErrorMessage = messageUtil.getMessage("maxlength", new String[] {"備考", "100"});
+				return noteErrorMessage;
+			}
+
+			if (hasStartHour ^ hasStartMinute) {
+				String startTimeErrorMessage = messageUtil.getMessage("input.invalid", new String[] {"出勤時間"});
+				return startTimeErrorMessage;
+			}
+
+			if (hasEndHour ^ hasEndMinute) {
+				String endTimeErrorMessage = messageUtil.getMessage("input.invalid", new String[] {"退勤時間"});
+				return endTimeErrorMessage;
+			}
+			
+			if (hasStartTime == null || hasEndTime == null) {
+				String attendanceEmptyMessage = messageUtil.getMessage("attendance.punchInEmpty");
+				return attendanceEmptyMessage;
+			}
+			
+			try {
+	            LocalTime start = LocalTime.parse(hasStartTime);
+	            LocalTime end = LocalTime.parse(hasEndTime);
+
+	            if (end.isBefore(start)) {
+	                String attendanceRangeMessage = messageUtil.getMessage("attendance.trainingTimeRange");
+	                return attendanceRangeMessage;
+	            }
+	        } catch (Exception e) {
+	            String timeFormatMessage = messageUtil.getMessage("attendance.timeFormatError");
+	            return timeFormatMessage;
+	        }
+	    }
+		return null;
+	}
 }
