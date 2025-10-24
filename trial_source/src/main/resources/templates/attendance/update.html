@@ -18,6 +18,13 @@
 			<h2><small>途中退校日：${dispLeaveDate}</small></h2>
 		</th:block>
 	</th:block>
+	
+	<!-- エラーメッセージ -->
+	<th:block th:if="${not #strings.isEmpty(error)}" id="error">
+		<ul style="padding-left: 0; list-style: none;">
+			<li><span th:text="'*' + '&nbsp' + ${error}" class="help-inline error"></span></li>
+		</ul>
+	</th:block>
 
 	<div class="row">
 		<div>
@@ -65,9 +72,9 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}"
-													th:selected="${entry.key == dailyAttendanceForm.trainingStartHour}">
+												<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.value}"
+													th:text="${hour.value}"
+													th:selected="${hour.key == dailyAttendanceForm.trainingStartHour}">
 													[[${entry.value}]]>
 												</option>
 											</select>
@@ -76,9 +83,9 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}"
-													th:selected="${entry.key == dailyAttendanceForm.trainingStartMinute}">
+												<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.value}"
+													th:text="${minute.value}"
+													th:selected="${minute.key == dailyAttendanceForm.trainingStartMinute}">
 													[[${entry.value}]]>
 												</option>
 											</select>
@@ -92,9 +99,9 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="entry : ${hourMap}" th:value="${entry.value}"
-													th:text="${entry.value}"
-													th:selected="${entry.key == dailyAttendanceForm.trainingEndHour}">
+												<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.value}"
+													th:text="${hour.value}"
+													th:selected="${hour.key == dailyAttendanceForm.trainingEndHour}">
 													[[${entry.value}]]>
 												</option>
 											</select>
@@ -103,9 +110,9 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="entry : ${minuteMap}" th:value="${entry.value}"
-													th:text="${entry.value}"
-													th:selected="${entry.key == dailyAttendanceForm.trainingEndMinute}">
+												<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.value}"
+													th:text="${minute.value}"
+													th:selected="${minute.key == dailyAttendanceForm.trainingEndMinute}">
 													[[${entry.value}]]>
 												</option>
 											</select>

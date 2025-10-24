@@ -1,6 +1,7 @@
 package jp.co.sss.lms.util;
 
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -232,5 +233,20 @@ public class AttendanceUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public TrainingTime calcJukoTime(TrainingTime trainingStartTime, TrainingTime trainingEndTime) {
+		
+		LocalTime start = LocalTime.of(trainingStartTime.getHour(), trainingStartTime.getMinute());
+		LocalTime end = LocalTime.of(trainingEndTime.getHour(), trainingEndTime.getMinute());
+		
+		Duration duration = Duration.between(start, end);
+		
+		long hours = duration.toHours();
+		long minutes = duration.toMinutes() % 60;
+		
+		TrainingTime jukoTime = new TrainingTime((int) hours, (int) minutes);
+		
+		return jukoTime;
 	}
 }

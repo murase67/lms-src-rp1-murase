@@ -1,6 +1,7 @@
 package jp.co.sss.lms.controller;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,6 @@ public class AttendanceController {
 		//過去日の未入力チェック
 		boolean hasUnenteredPast = studentAttendanceService.hasUnenteredPastAttendance();
 		model.addAttribute("hasUnenteredPast", hasUnenteredPast);
-		
-		System.out.println(hasUnenteredPast);
 
 		return "attendance/detail";
 	}
@@ -127,9 +126,6 @@ public class AttendanceController {
 				.setAttendanceForm(attendanceManagementDtoList);
 		model.addAttribute("attendanceForm", attendanceForm);
 
-		// Task26 時・分のプルダウンマップの取得
-		model.addAttribute("hourMap", attendanceUtil.getHourMap());
-		model.addAttribute("minuteMap", attendanceUtil.getMinuteMap());
 
 		return "attendance/update";
 	}
@@ -147,10 +143,29 @@ public class AttendanceController {
 	public String complete(AttendanceForm attendanceForm, Model model, BindingResult result)
 			throws ParseException {
 
+		// 更新前のチェック
+		List<String> errors = new ArrayList<String>();
+		errors = studentAttendanceService.validationAttendanceUpdate(attendanceForm);
+
+		if (errors != null) {
+			
+			model.addAttribute("errors", errors);
+			
+			attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+			attendanceForm.setHourMap(attendanceUtil.getHourMap());
+			attendanceForm.setMinuteMap(attendanceUtil.getMinuteMap());
+			
+			List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
+					.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
+			model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
+			
+			return "attendance/update";
+		}
+
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);
 		model.addAttribute("message", message);
-		
+
 		// 一覧の再取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
