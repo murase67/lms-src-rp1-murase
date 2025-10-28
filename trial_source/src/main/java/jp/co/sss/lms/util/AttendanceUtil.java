@@ -127,7 +127,7 @@ public class AttendanceUtil {
 			} else if (minute == 0) {
 				time = hour + "時間";
 			} else {
-				time = hour + "時" + minute + "分";
+				time = hour + "時間" + minute + "分";
 			}
 
 			map.put(i, time);

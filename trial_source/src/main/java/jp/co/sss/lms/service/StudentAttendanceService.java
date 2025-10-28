@@ -388,9 +388,7 @@ public class StudentAttendanceService {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println(trainingDate);
-
+		
 		Integer notInputCount = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE, trainingDate);
 
 		return notInputCount != null && notInputCount > 0;
@@ -401,36 +399,35 @@ public class StudentAttendanceService {
 	 * 
 	 * @author 村瀬
 	 * @param attendanceForm
-	 * @return
+	 * @return エラーメッセージ
 	 */
-	public List<String> validationAttendanceUpdate(AttendanceForm attendanceForm){
-		
-		for (DailyAttendanceForm dailyForm : attendanceForm.getAttendanceList()) {
-	        Integer startHour = dailyForm.getTrainingStartHour();
-	        Integer startMinute = dailyForm.getTrainingStartMinute();
-	        if (startHour != null && startMinute != null) {
-	            dailyForm.setTrainingStartTime(String.format("%02d:%02d", startHour, startMinute));
-	        }
+	public List<String> validationAttendanceUpdate(AttendanceForm attendanceForm) {
 
-	        Integer endHour = dailyForm.getTrainingEndHour();
-	        Integer endMinute = dailyForm.getTrainingEndMinute();
-	        if (endHour != null && endMinute != null) {
-	            dailyForm.setTrainingEndTime(String.format("%02d:%02d", endHour, endMinute));
-	        }
-	    }
+		
+		// 出勤・退勤時間を形成
+		for (DailyAttendanceForm dailyForm : attendanceForm.getAttendanceList()) {
+			Integer startHour = dailyForm.getTrainingStartHour();
+			Integer startMinute = dailyForm.getTrainingStartMinute();
+			if (startHour != null && startMinute != null) {
+				dailyForm.setTrainingStartTime(String.format("%02d:%02d", startHour, startMinute));
+			}
+
+			Integer endHour = dailyForm.getTrainingEndHour();
+			Integer endMinute = dailyForm.getTrainingEndMinute();
+			if (endHour != null && endMinute != null) {
+				dailyForm.setTrainingEndTime(String.format("%02d:%02d", endHour, endMinute));
+			}
+		}
 
 		int listCount = 0;
 
-		System.out.println("確認");
-
-		//		日付フォーマット
+		// 日付フォーマット
 		SimpleDateFormat[] dateFormats = {
-				new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH), // 英語形式
-				new SimpleDateFormat("yyyy/M/d") // スラッシュ形式（1桁もOK）
+				new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH),
+				new SimpleDateFormat("yyyy/M/d")
 		};
 		SimpleDateFormat dateOnly = new SimpleDateFormat("yyyy/MM/dd");
-//		SimpleDateFormat timeFmt = new SimpleDateFormat("HH:mm");
-		
+
 		List<String> errors = new ArrayList<String>();
 
 		try {
@@ -443,14 +440,13 @@ public class StudentAttendanceService {
 				String dateStr = dailyForm.getTrainingDate();
 				if (dateStr == null || dateStr.isEmpty())
 					continue;
-				
-//				① 日付文字列が null/空ならスキップ
-			    if (dateStr == null || dateStr.trim().isEmpty()) {
-			        System.out.println(listCount + "行目: trainingDate が空 → スキップ");
-			        continue;
-			    }
 
-				// ★ 簡潔なパース処理：複数フォーマットを順に試す
+				// 日付文字列が null/空ならスキップ
+				if (dateStr == null || dateStr.trim().isEmpty()) {
+					continue;
+				}
+
+				// パース処理：複数フォーマットを順に試す
 				Date trainingDate = null;
 				for (SimpleDateFormat fmt : dateFormats) {
 					try {
@@ -459,25 +455,21 @@ public class StudentAttendanceService {
 					} catch (ParseException ignored) {
 					}
 				}
-				
-				// ② パース失敗（null）の場合はスキップ
-			    if (trainingDate == null) {
-			        System.out.println(listCount + "行目: trainingDate パース失敗 → " + dateStr);
-			        continue;
-			    }
-			    
+
+				// パース失敗（null）の場合はスキップ
+				if (trainingDate == null) {
+					continue;
+				}
+
 				// 今日・未来はスキップ
 				Date trainingDateOnly = dateOnly.parse(dateOnly.format(trainingDate));
 				if (!trainingDateOnly.before(today))
 					continue;
-			
 
 				// 欠席スキップ
 				String status = dailyForm.getStatus();
 				if (status != null && status.equals(1))
 					continue;
-				
-				System.out.println("[" + listCount + "] trainingDate = " + dailyForm.getTrainingDate());
 
 				String hasStartTime = dailyForm.getTrainingStartTime();
 				String hasEndTime = dailyForm.getTrainingEndTime();
@@ -486,50 +478,47 @@ public class StudentAttendanceService {
 				boolean hasStartMinute = dailyForm.getTrainingStartMinute() != null;
 				boolean hasEndHour = dailyForm.getTrainingEndHour() != null;
 				boolean hasEndMinute = dailyForm.getTrainingEndMinute() != null;
-				
-				 // ③ 時刻がnull/空ならスキップ（またはエラー判定）
-			    if (hasStartTime == null || hasStartTime.isEmpty() ||
-			        hasEndTime == null || hasEndTime.isEmpty()) {
-			        errors.add(messageUtil.getMessage("attendance.punchInEmpty"));
-			        continue; // ← null時にparseしないようにする
-			    }
 
-				// 備考100文字チェック
+				// 備考が100文字を超えていないかチェック
 				if (hasNote != null && hasNote.length() > 100) {
 					errors.add(messageUtil.getMessage("maxlength", new String[] { "備考", "100" }));
 				}
 
-				// 出勤時間の時か分どちらかが未入力の場合にエラー判定
+				// 出勤時間の時か分どちらか未入力でないかチェック
 				if (hasStartHour ^ hasStartMinute) {
 					errors.add(messageUtil.getMessage("input.invalid", new String[] { "出勤時間" }));
 				}
 
-				// 退勤時間の時か分どちらかが未入力の場合にエラー判定
+				// 退勤時間の時か分どちらかが未入力でないかチェック
 				if (hasEndHour ^ hasEndMinute) {
 					errors.add(messageUtil.getMessage("input.invalid", new String[] { "退勤時間" }));
 				}
 
-				// 未入力チェック
-				if (hasStartTime == null || hasStartTime.isEmpty() ||
-						hasEndTime == null || hasEndTime.isEmpty()) {
+				// 出勤時間が未入力の場合で退勤時間に入力がないかチェック
+				if (!hasStartHour && !hasStartMinute && (hasEndHour || hasEndMinute)) {
 					errors.add(messageUtil.getMessage("attendance.punchInEmpty"));
 				}
 
-				// 出退勤時間の順序チェック
-				SimpleDateFormat timeFmt = new SimpleDateFormat("HH:mm");
-				Date start = timeFmt.parse(hasStartTime);
-				Date end = timeFmt.parse(hasEndTime);
-				if (end.before(start)) {
-					errors.add(messageUtil.getMessage("attendance.trainingTimeRange", new String[] { String.valueOf(listCount) }));
-				}
+				//出勤・退勤時間が未入力でない場合にチェックをする
+				if (hasStartHour && hasStartMinute && hasEndHour && hasEndMinute) {
 
-				// 受講時間と中抜け時間のチェック
-				TrainingTime juko = attendanceUtil.calcJukoTime(
-						new TrainingTime(hasStartTime), new TrainingTime(hasEndTime));
-				int jukoMinutes = juko.getHour() * 60 + juko.getMinute();
-				Integer blank = dailyForm.getBlankTime();
-				if (blank != null && blank > jukoMinutes) {
-					errors.add(messageUtil.getMessage("attendance.blankTimeError"));
+					// 退勤時間が出勤時間より前でないかチェック
+					SimpleDateFormat timeFmt = new SimpleDateFormat("HH:mm");
+					Date start = timeFmt.parse(hasStartTime);
+					Date end = timeFmt.parse(hasEndTime);
+					if (end.before(start)) {
+						errors.add(messageUtil.getMessage("attendance.trainingTimeRange",
+								new String[] { String.valueOf(listCount) }));
+					}
+
+					// 中抜け時間が受講時間を超えていないかチェック
+					TrainingTime juko = attendanceUtil.calcJukoTime(
+							new TrainingTime(hasStartTime), new TrainingTime(hasEndTime));
+					int jukoMinutes = juko.getHour() * 60 + juko.getMinute();
+					Integer blank = dailyForm.getBlankTime();
+					if (blank != null && blank > jukoMinutes) {
+						errors.add(messageUtil.getMessage("attendance.blankTimeError"));
+					}
 				}
 			}
 		} catch (ParseException e) {

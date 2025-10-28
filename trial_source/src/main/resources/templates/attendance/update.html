@@ -18,18 +18,19 @@
 			<h2><small>途中退校日：${dispLeaveDate}</small></h2>
 		</th:block>
 	</th:block>
-	
+
 	<!-- エラーメッセージ -->
-	<th:block th:if="${not #strings.isEmpty(error)}" id="error">
-		<ul style="padding-left: 0; list-style: none;">
-			<li><span th:text="'*' + '&nbsp' + ${error}" class="help-inline error"></span></li>
+	<th:block th:if="${errors != null and !errors.isEmpty()}" id="error">
+		<ul style="padding-left: 1.5em; margin: 8px 0; list-style-type: disc; font-weight: bold; color: #b94a48;">
+			<li th:each="error : ${errors}" th:text="${error}" style="display: list-item; margin-bottom: 4px;"></li>
 		</ul>
 	</th:block>
+
 
 	<div class="row">
 		<div>
 
-			<form th:action="@{/attendance/update}" method="post" onsubmit="updateCheck()">
+			<form th:action="@{/attendance/update}" method="post" onsubmit="return updateCheck()">
 				<div style="width: 100%; max-height: 600px; overflow-y: auto;" class="bs-component col-sm-12">
 					<table style="width: 100%; border-collapse: collapse;"
 						class="table table-hover dataTable no-footer">
@@ -72,8 +73,8 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.value}"
-													th:text="${hour.value}"
+												<option th:each="hour : ${attendanceForm.hourMap}"
+													th:value="${hour.value}" th:text="${hour.value}"
 													th:selected="${hour.key == dailyAttendanceForm.trainingStartHour}">
 													[[${entry.value}]]>
 												</option>
@@ -83,8 +84,8 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.value}"
-													th:text="${minute.value}"
+												<option th:each="minute : ${attendanceForm.minuteMap}"
+													th:value="${minute.value}" th:text="${minute.value}"
 													th:selected="${minute.key == dailyAttendanceForm.trainingStartMinute}">
 													[[${entry.value}]]>
 												</option>
@@ -99,8 +100,8 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.value}"
-													th:text="${hour.value}"
+												<option th:each="hour : ${attendanceForm.hourMap}"
+													th:value="${hour.value}" th:text="${hour.value}"
 													th:selected="${hour.key == dailyAttendanceForm.trainingEndHour}">
 													[[${entry.value}]]>
 												</option>
@@ -110,8 +111,8 @@
 												class="form-control"
 												style="display:inline-block !important; width:55px !important; padding:2px; height:38px;">
 												<option value=""></option>
-												<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.value}"
-													th:text="${minute.value}"
+												<option th:each="minute : ${attendanceForm.minuteMap}"
+													th:value="${minute.value}" th:text="${minute.value}"
 													th:selected="${minute.key == dailyAttendanceForm.trainingEndMinute}">
 													[[${entry.value}]]>
 												</option>
@@ -120,7 +121,7 @@
 									</td>
 
 									<td class="w80">
-										<div style="width: 90px;">
+										<div style="width: 120px;">
 											<select th:name="|attendanceList[${stat.index}].blankTime|"
 												class="form-control">
 												<option th:each="blankTime : ${attendanceForm.blankTimes}"
@@ -159,10 +160,51 @@
 		//Task27-村瀬-更新ボタン押下時に確認ダイアログを表示
 		function updateCheck() {
 			let result = confirm("更新します。よろしいですか？");
-			if (!result) {
-				event.preventDefault();
-			}
+			return result;
 		}
+
+		//Task27-村瀬-入力チェック後に未入力欄の背景色を赤に変更
+		let errors = /*[[${errors}]]*/[];
+
+		document.addEventListener("DOMContentLoaded", () => {
+			if (!errors || errors.length === 0) return;
+
+			const highlightError = (selector, condition) => {
+				document.querySelectorAll(selector).forEach(el => {
+					if (condition(el)) {
+						el.style.backgroundColor = "#f8d7da";
+						el.style.border = "1px solid red";
+					}
+				});
+			};
+
+			errors.forEach(err => {
+				// 出勤時間のエラー
+				if (err.includes("出勤時間")) {
+					highlightError("select[name*='trainingStartHour'], select[name*='trainingStartMinute']", el => !el.value);
+				}
+
+				// 退勤時間のエラー
+				if (err.includes("退勤時間")) {
+					highlightError("select[name*='trainingEndHour'], select[name*='trainingEndMinute']", el => !el.value);
+				}
+
+				// 備考エラー
+				if (err.includes("備考")) {
+					highlightError("input[name*='note']", el => !el.value.trim());
+				}
+
+				//入力後に背景を白に戻す
+				document.querySelectorAll("select, input[type='text']").forEach(el => {
+					el.addEventListener("change", () => {
+						if (el.value && el.value.trim() !== "") {
+							el.style.backgroundColor = "white";
+							el.style.border = "1px solid #ced4da";
+						}
+					});
+				});
+			});
+		});
 
 	</script>
 

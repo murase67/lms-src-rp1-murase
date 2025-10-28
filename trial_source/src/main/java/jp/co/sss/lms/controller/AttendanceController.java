@@ -126,7 +126,6 @@ public class AttendanceController {
 				.setAttendanceForm(attendanceManagementDtoList);
 		model.addAttribute("attendanceForm", attendanceForm);
 
-
 		return "attendance/update";
 	}
 
@@ -147,18 +146,21 @@ public class AttendanceController {
 		List<String> errors = new ArrayList<String>();
 		errors = studentAttendanceService.validationAttendanceUpdate(attendanceForm);
 
-		if (errors != null) {
-			
+		// エラーリストがnullまたは空出ない場合に実施
+		if (errors != null && !errors.isEmpty()) {
+
 			model.addAttribute("errors", errors);
-			
+
+			// 時・分・中抜け時間のプルダウンを再取得
 			attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
 			attendanceForm.setHourMap(attendanceUtil.getHourMap());
 			attendanceForm.setMinuteMap(attendanceUtil.getMinuteMap());
-			
+
+			// 一覧の取得
 			List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 					.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 			model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-			
+
 			return "attendance/update";
 		}
 
